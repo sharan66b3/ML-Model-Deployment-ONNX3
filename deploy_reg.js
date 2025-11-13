@@ -4,7 +4,6 @@
 const NUMERIC_FEATURES = ['CO AQI Value', 'Ozone AQI Value', 'NO2 AQI Value', 'PM2.5 AQI Value'];
 
 // 2. Standard Scaler Statistics (✅ UPDATED with Python mean_ and scale_ arrays)
-// [CO AQI, Ozone AQI, NO2 AQI, PM2.5 AQI]
 const SCALER_MEANS = [2.0537, 35.8034, 4.0901, 47.9602]; 
 const SCALER_STDS = [3.6358, 19.3361, 8.0163, 47.8938];  
 
@@ -17,7 +16,8 @@ const OHE_CATEGORIES = [
 
 // --- MODEL SETUP ---
 let regSession = null;
-const REG_MODEL_PATH = './regression_model.onnx';
+// 🛑 FIX: Updated ONNX model name to match user's saved file
+const REG_MODEL_PATH = './regression_model (1).onnx'; 
 
 // --- MAIN EXECUTION LOGIC (FIX FOR "CANNOT SET PROPERTIES OF NULL") ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 modelStatusElement.innerText = "Loading regression model...";
             }
             
-            // This is where ONNX Runtime fetches the model file
             regSession = await ort.InferenceSession.create(REG_MODEL_PATH);
             
             if (modelStatusElement) {
@@ -38,8 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {
             if (modelStatusElement) {
-                // If this message appears, the .onnx file itself failed to load (check file name/path)
-                modelStatusElement.innerText = `❌ Error loading regression model. Check console for model file path/naming errors.`;
+                modelStatusElement.innerText = `❌ Error loading regression model. Check console for model file path/naming errors (Expected: ${REG_MODEL_PATH}).`;
             }
             console.error("Error loading ONNX model:", e);
         }
@@ -83,7 +81,7 @@ function buildInputTensor(inputs) {
 }
 
 
-// --- INFERENCE LOGIC (Must be globally accessible to the HTML button) ---
+// --- INFERENCE LOGIC (Must be globally accessible) ---
 
 async function predictAQI() {
     if (!regSession) {
