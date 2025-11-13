@@ -1,13 +1,13 @@
 // --- CRITICAL PRE-PROCESSING CONSTANTS ---
 
-// 1. Numeric Feature Order
+// 1. Numeric Feature Order (Must match Python training order)
 const NUMERIC_FEATURES = ['CO AQI Value', 'Ozone AQI Value', 'NO2 AQI Value', 'PM2.5 AQI Value'];
 
-// 2. Standard Scaler Statistics (REPLACE THESE WITH YOUR PYTHON SCALER'S mean_ and scale_ arrays from reg_training.py)
-const SCALER_MEANS = [2.00, 36.00, 4.00, 50.00]; // Placeholder!
-const SCALER_STDS = [2.00, 20.00, 8.00, 50.00];  // Placeholder!
+// 2. Standard Scaler Statistics (⚠️ REPLACE THESE WITH YOUR PYTHON SCALER'S mean_ and scale_ arrays)
+const SCALER_MEANS = [2.00, 36.00, 4.00, 50.00]; // PLACEHOLDER VALUES - UPDATE THIS ARRAY
+const SCALER_STDS = [2.00, 20.00, 8.00, 50.00];  // PLACEHOLDER VALUES - UPDATE THIS ARRAY
 
-// 3. One-Hot Encoder Categories and Order (Must match the OHE columns order in the final 15-feature tensor)
+// 3. One-Hot Encoder Categories and Order 
 const OHE_CATEGORIES = [
     'Brazil', 'Canada', 'China', 'France', 'Germany', 'India', 'Japan', 
     'Russian Federation', 'United Kingdom of Great Britain and Northern Ireland', 
@@ -33,7 +33,7 @@ async function loadModels() {
 loadModels();
 
 
-// --- PRE-PROCESSING LOGIC (Shared with Classification) ---
+// --- PRE-PROCESSING LOGIC ---
 function scaleNumericFeatures(values) {
     return values.map((val, i) => (val - SCALER_MEANS[i]) / SCALER_STDS[i]);
 }
