@@ -3,7 +3,7 @@
 // 1. Numeric Feature Order
 const NUMERIC_FEATURES = ['CO AQI Value', 'Ozone AQI Value', 'NO2 AQI Value', 'PM2.5 AQI Value'];
 
-// 2. Standard Scaler Statistics (✅ UPDATED with Python mean_ and scale_ arrays)
+// 2. Standard Scaler Statistics 
 const SCALER_MEANS = [2.0537, 35.8034, 4.0901, 47.9602]; 
 const SCALER_STDS = [3.6358, 19.3361, 8.0163, 47.8938]; 
 
@@ -16,12 +16,12 @@ const OHE_CATEGORIES = [
 
 // --- MODEL SETUP ---
 let clsSession = null;
-// 🛑 FIX: Updated ONNX model name to match user's saved file
+// ✅ FIX APPLIED HERE: Updated ONNX model name to classification_model (1).onnx
 const CLS_MODEL_PATH = './classification_model (1).onnx'; 
 
-// --- MAIN EXECUTION LOGIC (FIX FOR "CANNOT SET PROPERTIES OF NULL") ---
+// --- MAIN EXECUTION LOGIC (FIXED) ---
 document.addEventListener('DOMContentLoaded', () => {
-    // We can now safely access the element because the DOM is loaded
+    // Access the element safely after the DOM is loaded
     const modelStatusElement = document.getElementById('model-status');
 
     async function loadModels() {
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {
             if (modelStatusElement) {
+                // Now displays the correct expected path if the model still fails to load
                 modelStatusElement.innerText = `❌ Error loading classification model. Check console for model file path/naming errors (Expected: ${CLS_MODEL_PATH}).`;
             }
             console.error("Error loading ONNX model:", e);
@@ -105,7 +106,7 @@ async function predictAQI() {
         const clsResults = await clsSession.run(feeds);
         const clsLogit = clsResults.output.data[0];
         
-        // Apply Sigmoid to the logit
+        // Apply Sigmoid to the logit to get probability
         const probability = 1 / (1 + Math.exp(-clsLogit));
         
         // Classify: AQI Category 'Good' is the target (1)
