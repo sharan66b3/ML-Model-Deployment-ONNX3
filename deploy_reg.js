@@ -3,9 +3,10 @@
 // 1. Numeric Feature Order (Must match Python training order)
 const NUMERIC_FEATURES = ['CO AQI Value', 'Ozone AQI Value', 'NO2 AQI Value', 'PM2.5 AQI Value'];
 
-// 2. Standard Scaler Statistics (⚠️ REPLACE THESE WITH YOUR PYTHON SCALER'S mean_ and scale_ arrays)
-const SCALER_MEANS = [2.00, 36.00, 4.00, 50.00]; // PLACEHOLDER VALUES - UPDATE THIS ARRAY
-const SCALER_STDS = [2.00, 20.00, 8.00, 50.00];  // PLACEHOLDER VALUES - UPDATE THIS ARRAY
+// 2. Standard Scaler Statistics (✅ UPDATED with Python mean_ and scale_ arrays)
+// [CO AQI, Ozone AQI, NO2 AQI, PM2.5 AQI]
+const SCALER_MEANS = [2.0537, 35.8034, 4.0901, 47.9602]; 
+const SCALER_STDS = [3.6358, 19.3361, 8.0163, 47.8938];  
 
 // 3. One-Hot Encoder Categories and Order 
 const OHE_CATEGORIES = [
@@ -16,11 +17,11 @@ const OHE_CATEGORIES = [
 
 // --- MODEL SETUP ---
 let regSession = null;
-const REG_MODEL_PATH = './regression_model.onnx'; // Relative path for simple deployment
+const REG_MODEL_PATH = './regression_model.onnx';
 
-// --- MAIN EXECUTION LOGIC (The Fix is here) ---
+// --- MAIN EXECUTION LOGIC (FIX FOR "CANNOT SET PROPERTIES OF NULL") ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Now we are GUARANTEED that 'model-status' exists
+    // We can now safely access the element
     const modelStatusElement = document.getElementById('model-status');
     
     async function loadModels() {
@@ -36,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {
             if (modelStatusElement) {
-                modelStatusElement.innerText = `❌ Error loading regression model. Check console for model file path/naming errors.`;
+                modelStatusElement.innerText = `❌ Error loading regression model. Check console and model path.`;
             }
             console.error("Error loading ONNX model:", e);
         }
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// --- PRE-PROCESSING LOGIC (Independent of DOM load) ---
+// --- PRE-PROCESSING LOGIC ---
 
 function scaleNumericFeatures(values) {
     return values.map((val, i) => (val - SCALER_MEANS[i]) / SCALER_STDS[i]);
@@ -80,7 +81,7 @@ function buildInputTensor(inputs) {
 }
 
 
-// --- INFERENCE LOGIC (Called by the HTML button) ---
+// --- INFERENCE LOGIC (Must be globally accessible to the HTML button) ---
 
 async function predictAQI() {
     if (!regSession) {
