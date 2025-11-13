@@ -21,7 +21,7 @@ const REG_MODEL_PATH = './regression_model.onnx';
 
 // --- MAIN EXECUTION LOGIC (FIX FOR "CANNOT SET PROPERTIES OF NULL") ---
 document.addEventListener('DOMContentLoaded', () => {
-    // We can now safely access the element
+    // We can now safely access the element because the DOM is loaded
     const modelStatusElement = document.getElementById('model-status');
     
     async function loadModels() {
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modelStatusElement.innerText = "Loading regression model...";
             }
             
+            // This is where ONNX Runtime fetches the model file
             regSession = await ort.InferenceSession.create(REG_MODEL_PATH);
             
             if (modelStatusElement) {
@@ -37,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {
             if (modelStatusElement) {
-                modelStatusElement.innerText = `❌ Error loading regression model. Check console and model path.`;
+                // If this message appears, the .onnx file itself failed to load (check file name/path)
+                modelStatusElement.innerText = `❌ Error loading regression model. Check console for model file path/naming errors.`;
             }
             console.error("Error loading ONNX model:", e);
         }
