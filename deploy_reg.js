@@ -16,22 +16,32 @@ const OHE_CATEGORIES = [
 
 // --- MODEL SETUP ---
 let regSession = null;
-const REG_MODEL_PATH = './regression_model.onnx';
+// ⚠️ CHANGE THIS TO YOUR ACTUAL PUBLIC URL (AWS S3, GCS, or CDN)
+const REG_MODEL_PATH = 'https://your-cloud-host.com/models/regression_model.onnx'; 
+// Example: 'https://s3.amazonaws.com/your-bucket/regression_model.onnx'
+
 const modelStatusElement = document.getElementById('model-status');
 
 // Load model asynchronously
 async function loadModels() {
     try {
-        modelStatusElement.innerText = "Loading regression model...";
+        if (modelStatusElement) {
+            modelStatusElement.innerText = "Loading regression model from cloud...";
+        }
+        
+        // ORT will now fetch the model from the specified HTTPS URL
         regSession = await ort.InferenceSession.create(REG_MODEL_PATH);
-        modelStatusElement.innerText = "✅ Regression model loaded. Ready for prediction.";
+        
+        if (modelStatusElement) {
+            modelStatusElement.innerText = "✅ Regression model loaded. Ready for prediction.";
+        }
     } catch (e) {
-        modelStatusElement.innerText = `❌ Error loading regression model: ${e.message}`;
-        console.error(e);
+        if (modelStatusElement) {
+            modelStatusElement.innerText = `❌ Error loading regression model. Check console and the URL: ${REG_MODEL_PATH}`;
+        }
+        console.error("Error loading ONNX model from cloud:", e);
     }
 }
-loadModels();
-
 
 // --- PRE-PROCESSING LOGIC ---
 function scaleNumericFeatures(values) {
@@ -98,3 +108,5 @@ async function predictAQI() {
         console.error("Inference failed:", e);
     }
 }
+
+loadModels();
