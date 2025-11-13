@@ -16,34 +16,38 @@ const OHE_CATEGORIES = [
 
 // --- MODEL SETUP ---
 let regSession = null;
-// ⚠️ CHANGE THIS TO YOUR ACTUAL PUBLIC URL (AWS S3, GCS, or CDN)
-const REG_MODEL_PATH = 'https://your-cloud-host.com/models/regression_model.onnx'; 
-// Example: 'https://s3.amazonaws.com/your-bucket/regression_model.onnx'
+const REG_MODEL_PATH = './regression_model.onnx'; // Relative path for simple deployment
 
-const modelStatusElement = document.getElementById('model-status');
-
-// Load model asynchronously
-async function loadModels() {
-    try {
-        if (modelStatusElement) {
-            modelStatusElement.innerText = "Loading regression model from cloud...";
+// --- MAIN EXECUTION LOGIC (The Fix is here) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Now we are GUARANTEED that 'model-status' exists
+    const modelStatusElement = document.getElementById('model-status');
+    
+    async function loadModels() {
+        try {
+            if (modelStatusElement) {
+                modelStatusElement.innerText = "Loading regression model...";
+            }
+            
+            regSession = await ort.InferenceSession.create(REG_MODEL_PATH);
+            
+            if (modelStatusElement) {
+                modelStatusElement.innerText = "✅ Regression model loaded. Ready for prediction.";
+            }
+        } catch (e) {
+            if (modelStatusElement) {
+                modelStatusElement.innerText = `❌ Error loading regression model. Check console for model file path/naming errors.`;
+            }
+            console.error("Error loading ONNX model:", e);
         }
-        
-        // ORT will now fetch the model from the specified HTTPS URL
-        regSession = await ort.InferenceSession.create(REG_MODEL_PATH);
-        
-        if (modelStatusElement) {
-            modelStatusElement.innerText = "✅ Regression model loaded. Ready for prediction.";
-        }
-    } catch (e) {
-        if (modelStatusElement) {
-            modelStatusElement.innerText = `❌ Error loading regression model. Check console and the URL: ${REG_MODEL_PATH}`;
-        }
-        console.error("Error loading ONNX model from cloud:", e);
     }
-}
 
-// --- PRE-PROCESSING LOGIC ---
+    loadModels();
+});
+
+
+// --- PRE-PROCESSING LOGIC (Independent of DOM load) ---
+
 function scaleNumericFeatures(values) {
     return values.map((val, i) => (val - SCALER_MEANS[i]) / SCALER_STDS[i]);
 }
@@ -76,7 +80,7 @@ function buildInputTensor(inputs) {
 }
 
 
-// --- INFERENCE LOGIC ---
+// --- INFERENCE LOGIC (Called by the HTML button) ---
 
 async function predictAQI() {
     if (!regSession) {
@@ -108,5 +112,3 @@ async function predictAQI() {
         console.error("Inference failed:", e);
     }
 }
-
-loadModels();
