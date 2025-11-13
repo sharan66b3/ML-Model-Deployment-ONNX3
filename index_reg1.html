@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AQI Value Prediction (Regression)</title>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.3/dist/ort.min.js"></script>
-    <script src="deploy_reg.js"></script> 
     <style>
-        /* ... (CSS Styles omitted for brevity - use standard styles) ... */
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -49,5 +47,7 @@
         <h2>Regression Result</h2>
         <p><strong>Predicted AQI Value:</strong> <span id="reg_output">---</span></p>
     </div>
+    
+    <script src="deploy_reg.js"></script> 
 </body>
 </html>
